@@ -49,15 +49,7 @@ def _get_azure_blob_srv_client(endpoint: str) -> Optional[BlobServiceClient]:
 
     # Note: This will only work for one container
     if (sas_url := os.getenv("AZURE_BLOB_SAS_URL")) is not None:
-        client = BlobClient.from_blob_url(sas_url)
-
-        artifact_endpoint = urlparse(endpoint)
-        if client.container_name != artifact_endpoint.netloc:
-            raise ArtifactsException(
-                f"SAS URL's container name: '{client.container_name}' "
-                f"does not match artifact's container name: '{artifact_endpoint.netloc}'"
-            )
-        return client
+        return BlobServiceClient(sas_url)
 
     if (connect_str := os.getenv("AZURE_STORAGE_CONNECTION_STRING")) is not None:
         return BlobServiceClient.from_connection_string(connect_str)
